@@ -112,9 +112,9 @@ int main(void) {
 	//int ledstate;
 	uint32_t s0_msticks = 0;
 	uint8_t s0_active = 0;
-	uint8_t s0_state = 0;
-	uint8_t s0_oldState = 0;
-	uint8_t s0_newState = 0;
+	uint32_t s0_state = 0;
+	uint32_t s0_oldState = 0;
+	uint32_t s0_newState = 0;
 
 
 	//EINT3_enable();
