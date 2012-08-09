@@ -44,6 +44,10 @@ __CRP const unsigned int CRP_WORD = CRP_NO_CRP ;
 #include "uart.h"
 #include "logger.h"
 
+
+#define S0_INPUT0 (1 << 0)
+#define S0_INPUT1 (1 << 1)
+
 volatile uint32_t msTicks; // counter for 1ms SysTicks
 extern volatile unsigned int eint3_count;
 
@@ -97,7 +101,7 @@ int main(void) {
 	UARTSendCRLF(2);
 	UARTSendStringln(2, "UART2 online ...");
 
-	//EINT3_init();
+	EINT3_init();
 
 
 
@@ -123,19 +127,30 @@ int main(void) {
 			UARTSendByte(2,data);
 		}
 
+
 		if (!s0_active) {
-			s0_newState = LPC_GPIO2->FIOPIN & (1<<0);
+			//s0_newState = LPC_GPIO2->FIOPIN & (S0_INPUT0);
+			s0_newState = ~LPC_GPIO2->FIOPIN & (S0_INPUT0 | S0_INPUT1);
 			if (s0_oldState != s0_newState) {
 				s0_active = 1;
 				s0_msticks = msTicks;
 			}
 		}
+
 		if (s0_active && s0_msticks != msTicks) {
-			s0_state = LPC_GPIO2->FIOPIN & (1<<0);
-			if (s0_state ==  s0_newState) {
-				if (s0_newState == 0) {
+			s0_state = ~LPC_GPIO2->FIOPIN & (S0_INPUT0 | S0_INPUT1 );
+			logger_logNumberln(s0_state);
+			if (s0_state == s0_newState) {
+				// falling edge
+				if ((s0_newState & S0_INPUT0) > 0) {
 					led2_invert();
 				}
+
+				// rising edge
+				if ((s0_newState & S0_INPUT1) == 0) {
+					led2_invert();
+				}
+
 			}
 			s0_oldState = s0_state;
 			s0_active = 0;

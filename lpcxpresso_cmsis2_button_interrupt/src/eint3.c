@@ -10,7 +10,7 @@ void EINT3_init (void)
 {
 	eint3_count = 0;
 	LPC_GPIOINT->IO2IntEnF |= 1 << 0;
-	//LPC_GPIOINT->IO2IntEnR |= 1 << 0;
+	LPC_GPIOINT->IO2IntEnR |= 1 << 0;
 	
 	// Setup counter for number of ExtInt0's received
 
@@ -23,6 +23,7 @@ void EINT3_enable() {
 	eint3_count = 0;
 	LPC_GPIOINT->IO2IntClr |= (1 << 0);
 	LPC_GPIOINT->IO2IntEnF |= 1 << 0;
+	LPC_GPIOINT->IO2IntEnR |= 1 << 0;
 	//LPC_GPIOINT->IO2IntEnR |= 1 << 0;
 }
 
@@ -32,7 +33,7 @@ void EINT3_enable() {
 void EINT3_IRQHandler (void)
 {
 	//disable interrupt
-	//LPC_GPIOINT->IO2IntEnF &= ~(1 << 0);
+	LPC_GPIOINT->IO2IntEnF &= ~(1 << 0);
 
 
 	if (LPC_GPIOINT->IO2IntStatF & (1 << 0)) {
@@ -40,7 +41,14 @@ void EINT3_IRQHandler (void)
 		// Interrupt has been generated due to a falling edge on P2.0
 		eint3_count = 1;
 		//led2_invert();
-		LPC_GPIOINT->IO2IntEnF &= ~(1 << 0);
+		//LPC_GPIOINT->IO2IntEnF &= ~(1 << 0);
+	}
+	if (LPC_GPIOINT->IO2IntStatR & (1 << 0)) {
+		//UARTSendStringln(2, "1");
+		// Interrupt has been generated due to a falling edge on P2.0
+		eint3_count = 1;
+		//led2_invert();
+		//LPC_GPIOINT->IO2IntEnF &= ~(1 << 0);
 	}
 	/*
 	if (LPC_GPIOINT->IO2IntStatR & (1 << 0)) {
