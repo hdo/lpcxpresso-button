@@ -12,7 +12,7 @@
 void s0_init(void);
 uint32_t read_s0_status(void);
 void process_s0(uint32_t msTicks);
-uint32_t s0_triggered();
+uint32_t s0_triggered(uint8_t index);
 
 
 

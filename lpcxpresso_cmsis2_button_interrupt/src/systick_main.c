@@ -120,10 +120,17 @@ int main(void) {
 		}
 
 		process_s0(msTicks);
-		uint32_t triggerValue = s0_triggered();
+		uint32_t triggerValue = s0_triggered(0);
 		if (triggerValue) {
+			logger_logString("s0_0:");
 			logger_logNumberln(triggerValue);
 		}
+		triggerValue = s0_triggered(1);
+		if (triggerValue) {
+			logger_logString("s0_1:");
+			logger_logNumberln(triggerValue);
+		}
+
 
 		/*
 		if (!s0_active) {
