@@ -57,7 +57,6 @@ uint32_t s0_triggered(uint8_t index) {
 	if (s0_diff[index] > 10) {
 		uint32_t ret = s0_diff[index];
 		s0_diff[index] = 0;
-		logger_logNumberln(s0_input_count);
 		return ret;
 	}
 	return 0;
