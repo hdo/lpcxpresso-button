@@ -43,10 +43,7 @@ __CRP const unsigned int CRP_WORD = CRP_NO_CRP ;
 #include "leds.h"
 #include "uart.h"
 #include "logger.h"
-
-
-#define S0_INPUT0 (1 << 0)
-#define S0_INPUT1 (1 << 1)
+#include "s0_input.h"
 
 volatile uint32_t msTicks; // counter for 1ms SysTicks
 extern volatile unsigned int eint3_count;
@@ -59,7 +56,7 @@ void SysTick_Handler(void) {
 }
 
 // ****************
-// systick_delay - creates a delay of the appropriate number of Systicks (happens every 1 ms)
+// systick_delay - creates a delay of the appropriate number of Systicks (happens every 10 ms)
 __INLINE static void systick_delay (uint32_t delayTicks) {
   uint32_t currentTicks;
 
@@ -96,12 +93,12 @@ int main(void) {
 	led2_on();
 
 
-	UARTInit(2, 9600);	/* baud rate setting */
+	UARTInit(2, 115200);	/* baud rate setting */
 	UARTSendCRLF(2);
 	UARTSendCRLF(2);
 	UARTSendStringln(2, "UART2 online ...");
 
-	EINT3_init();
+	//EINT3_init();
 
 
 
@@ -110,11 +107,6 @@ int main(void) {
 	// Enter an infinite loop, just incrementing a counter and toggling leds every second
 	//led2_off();
 	//int ledstate;
-	uint32_t s0_msticks = 0;
-	uint8_t s0_active = 0;
-	uint32_t s0_state = 0;
-	uint32_t s0_oldState = 0;
-	uint32_t s0_newState = 0;
 
 
 	//EINT3_enable();
@@ -127,10 +119,15 @@ int main(void) {
 			UARTSendByte(2,data);
 		}
 
+		process_s0(msTicks);
+		uint32_t triggerValue = s0_triggered();
+		if (triggerValue) {
+			logger_logNumberln(triggerValue);
+		}
 
+		/*
 		if (!s0_active) {
-			//s0_newState = LPC_GPIO2->FIOPIN & (S0_INPUT0);
-			s0_newState = ~LPC_GPIO2->FIOPIN & (S0_INPUT0 | S0_INPUT1);
+			s0_newState = ~LPC_GPIO0->FIOPIN & (S0_INPUT0 | S0_INPUT1);
 			if (s0_oldState != s0_newState) {
 				s0_active = 1;
 				s0_msticks = msTicks;
@@ -138,7 +135,7 @@ int main(void) {
 		}
 
 		if (s0_active && s0_msticks != msTicks) {
-			s0_state = ~LPC_GPIO2->FIOPIN & (S0_INPUT0 | S0_INPUT1 );
+			s0_state = ~LPC_GPIO0->FIOPIN & (S0_INPUT0 | S0_INPUT1 );
 			logger_logNumberln(s0_state);
 			if (s0_state == s0_newState) {
 				// falling edge
@@ -155,7 +152,7 @@ int main(void) {
 			s0_oldState = s0_state;
 			s0_active = 0;
 		}
-
+		 */
 	}
 	return 0 ;
 }
