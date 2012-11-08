@@ -23,7 +23,7 @@ void logger_logStringln(char* data) {
 }
 void logger_logNumber(uint32_t value) {
 	char buf[10];
-	itoa(value, buf, 10);
+	uitoa(value, buf, 10);
 	logger_logString((char*) buf);
 }
 
