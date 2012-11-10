@@ -66,6 +66,9 @@ __INLINE static void systick_delay (uint32_t delayTicks) {
 }
 
 uint32_t get_diff(uint32_t value1, uint32_t value2) {
+	if (value1 == value2) {
+		return 0;
+	}
 	if (value1 > value2) {
 		return (value1 - value2);
 	}
@@ -84,8 +87,10 @@ int main(void) {
 	    while (1);  // Capture error
 	}
 
-	led2_init();	// Setup GPIO for LED2
+	led_init();	// Setup GPIO for LED2
 	led2_on();		// Turn LED2 on
+	//led_on(0);
+	//led_on(1);
 
 	systick_delay(100);
 	led2_off();
@@ -119,16 +124,22 @@ int main(void) {
 			UARTSendByte(2,data);
 		}
 
+		process_leds(msTicks);
+
 		process_s0(msTicks);
+
 		uint32_t triggerValue = s0_triggered(0);
 		if (triggerValue) {
 			logger_logString("s0_0:");
 			logger_logNumberln(triggerValue);
+			led_signal(0, 100, msTicks);
 		}
+
 		triggerValue = s0_triggered(1);
 		if (triggerValue) {
 			logger_logString("s0_1:");
 			logger_logNumberln(triggerValue);
+			led_signal(1, 100, msTicks);
 		}
 
 
