@@ -2,14 +2,14 @@
 #include "logger.h"
 #include "s0_input.h"
 
+#define DEBOUNCE_CONSTANT 10
+
 uint32_t s0_msticks[] = {0, 0, 0, 0};
 uint32_t s0_diff[] = {0, 0, 0, 0};
 uint32_t s0_oldState = 0;
 uint32_t s0_newState = 0;
 uint32_t s0_inputs[] = {S0_INPUT0, S0_INPUT1, S0_INPUT2, S0_INPUT3};
 uint8_t s0_input_count = sizeof(s0_inputs) / sizeof(uint32_t);
-//uint32_t s0_msticks0 = 0;
-//uint32_t s0_diff0 = 0;
 
 
 void s0_init(void) {
@@ -25,9 +25,19 @@ uint32_t read_s0_status() {
 
 
 void process_s0(uint32_t msTicks) {
+	uint8_t i;
+	uint32_t d;
+	for(i = 0; i < s0_input_count; i++) {
+		if (s0_msticks[i] != 0) {
+			d = msTicks - s0_msticks[i];
+			if (d > DEBOUNCE_CONSTANT) {
+				s0_diff[i] = d;
+				s0_msticks[i] = 0;
+			}
+		}
+	}
 	s0_newState = read_s0_status();
 	if (s0_newState != s0_oldState) {
-		uint8_t i;
 		for(i = 0; i < s0_input_count; i++) {
 			if (s0_newState & s0_inputs[i]) {
 				// if old is 0
@@ -38,8 +48,7 @@ void process_s0(uint32_t msTicks) {
 			} else {
 				// if old is 1
 				if (s0_oldState & s0_inputs[i]) {
-					s0_diff[i] = msTicks - s0_msticks[i];
-					//s0_diff0 = get_diff(msTicks, s0_msticks0);
+					s0_msticks[i] = 0;
 				}
 			}
 		}
@@ -48,10 +57,9 @@ void process_s0(uint32_t msTicks) {
 }
 
 uint32_t s0_triggered(uint8_t index) {
-	if (s0_diff[index] > 10) {
-		uint32_t ret = s0_diff[index];
+	if (s0_diff[index] > 1) {
 		s0_diff[index] = 0;
-		return ret;
+		return 1;
 	}
 	return 0;
 }
