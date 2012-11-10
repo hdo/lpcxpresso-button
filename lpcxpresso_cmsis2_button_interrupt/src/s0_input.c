@@ -1,5 +1,4 @@
 #include "LPC17xx.h"
-#include "logger.h"
 #include "s0_input.h"
 
 #define DEBOUNCE_CONSTANT 10
@@ -18,18 +17,35 @@ void s0_init(void) {
 	// no need to set FIODIR, since INPUT (0) is selected as default
 }
 
+uint32_t s0_calc_diff(uint32_t value1, uint32_t value2) {
+	if (value1 == value2) {
+		return 0;
+	}
+	if (value1 > value2) {
+		return (value1 - value2);
+	}
+	else {
+		// check for timer overflow
+		return (UINT32_MAX - value2 + value1);
+	}
+}
+
 uint32_t read_s0_status() {
 	// we're are using GPIO0 here !!!
+	// note that data is inverted (logic 0 -> 1) since we're are using pull-ups
 	return ~LPC_GPIO0->FIOPIN & (S0_INPUT0 | S0_INPUT1 | S0_INPUT2 | S0_INPUT3 );
 }
 
 
-void process_s0(uint32_t msTicks) {
+/**
+ * process s0 inputs with DEBOUNCE
+ */
+void process_s0(uint32_t msticks) {
 	uint8_t i;
 	uint32_t d;
 	for(i = 0; i < s0_input_count; i++) {
 		if (s0_msticks[i] != 0) {
-			d = msTicks - s0_msticks[i];
+			d = s0_calc_diff(msticks, s0_msticks[i]);
 			if (d > DEBOUNCE_CONSTANT) {
 				s0_diff[i] = d;
 				s0_msticks[i] = 0;
@@ -40,13 +56,13 @@ void process_s0(uint32_t msTicks) {
 	if (s0_newState != s0_oldState) {
 		for(i = 0; i < s0_input_count; i++) {
 			if (s0_newState & s0_inputs[i]) {
-				// if old is 0
+				// 0 to 1 transition
 				if ((s0_oldState & s0_inputs[i]) == 0) {
-					s0_msticks[i] = msTicks;
+					s0_msticks[i] = msticks;
 					s0_diff[i] = 0;
 				}
 			} else {
-				// if old is 1
+				// 1 to 0 transition
 				if (s0_oldState & s0_inputs[i]) {
 					s0_msticks[i] = 0;
 				}
