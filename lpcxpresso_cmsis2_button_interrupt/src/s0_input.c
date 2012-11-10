@@ -27,25 +27,19 @@ uint32_t read_s0_status() {
 void process_s0(uint32_t msTicks) {
 	s0_newState = read_s0_status();
 	if (s0_newState != s0_oldState) {
-		uint32_t newState, oldState;
 		uint8_t i;
 		for(i = 0; i < s0_input_count; i++) {
-			newState = s0_newState & s0_inputs[i];
-			oldState = s0_oldState & s0_inputs[i];
-			if (newState != oldState) {
-				if (newState) {
-					// if old is 0
-					if (oldState == 0) {
-						s0_msticks[i] = msTicks;
-						s0_diff[i] = 0;
-					}
+			if (s0_newState & s0_inputs[i]) {
+				// if old is 0
+				if ((s0_oldState & s0_inputs[i]) == 0) {
+					s0_msticks[i] = msTicks;
+					s0_diff[i] = 0;
 				}
-				else {
-					// if old is 1
-					if (oldState) {
-						s0_diff[i] = msTicks - s0_msticks[i];
-						//s0_diff0 = get_diff(msTicks, s0_msticks0);
-					}
+			} else {
+				// if old is 1
+				if (s0_oldState & s0_inputs[i]) {
+					s0_diff[i] = msTicks - s0_msticks[i];
+					//s0_diff0 = get_diff(msTicks, s0_msticks0);
 				}
 			}
 		}
