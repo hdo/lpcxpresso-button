@@ -98,10 +98,10 @@ int main(void) {
 	led2_on();
 
 
-	UARTInit(2, 115200);	/* baud rate setting */
-	UARTSendCRLF(2);
-	UARTSendCRLF(2);
-	UARTSendStringln(2, "UART2 online ...");
+	UARTInit(0, 115200);	/* baud rate setting */
+	UARTSendCRLF(0);
+	UARTSendCRLF(0);
+	UARTSendStringln(0, "UART2 online ...");
 
 	//EINT3_init();
 
@@ -119,9 +119,9 @@ int main(void) {
 	while(1) {
 
 		/* process logger */
-		if (logger_dataAvailable() && UARTTXReady(2)) {
+		if (logger_dataAvailable() && UARTTXReady(0)) {
 			uint8_t data = logger_read();
-			UARTSendByte(2,data);
+			UARTSendByte(0,data);
 		}
 
 		process_leds(msTicks);
@@ -132,14 +132,14 @@ int main(void) {
 		if (triggerValue) {
 			logger_logString("s0_0:");
 			logger_logNumberln(triggerValue);
-			led_signal(0, 100, msTicks);
+			led_signal(0, 30, msTicks);
 		}
 
 		triggerValue = s0_triggered(1);
 		if (triggerValue) {
 			logger_logString("s0_1:");
 			logger_logNumberln(triggerValue);
-			led_signal(1, 100, msTicks);
+			led_signal(1, 30, msTicks);
 		}
 
 
