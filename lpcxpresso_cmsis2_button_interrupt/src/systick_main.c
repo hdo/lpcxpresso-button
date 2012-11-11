@@ -1,34 +1,3 @@
-//*****************************************************************************
-//   +--+       
-//   | ++----+   
-//   +-++    |  
-//     |     |  
-//   +-+--+  |   
-//   | +--+--+  
-//   +----+    Copyright (c) 2010-11 Code Red Technologies Ltd.
-//
-// systick_main.c provides an example of how to use the SysTick timer
-// built in to the Cortex-M3 core of the LPC1768 MCU on the LPCXpresso1768
-// processor board. The example will cause the state of "LED2" (P0_22)
-// to toggle every second.
-//
-//
-// Software License Agreement
-// 
-// The software is owned by Code Red Technologies and/or its suppliers, and is 
-// protected under applicable copyright laws.  All rights are reserved.  Any 
-// use in violation of the foregoing restrictions may subject the user to criminal 
-// sanctions under applicable laws, as well as to civil liability for the breach 
-// of the terms and conditions of this license.
-// 
-// THIS SOFTWARE IS PROVIDED "AS IS".  NO WARRANTIES, WHETHER EXPRESS, IMPLIED
-// OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF
-// MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE.
-// USE OF THIS SOFTWARE FOR COMMERCIAL DEVELOPMENT AND/OR EDUCATION IS SUBJECT
-// TO A CURRENT END USER LICENSE AGREEMENT (COMMERCIAL OR EDUCATIONAL) WITH
-// CODE RED TECHNOLOGIES LTD. 
-
-// CMSIS headers required for setting up SysTick Timer
 #include "LPC17xx.h"
 #include "eint3.h"
 
@@ -63,19 +32,6 @@ __INLINE static void systick_delay (uint32_t delayTicks) {
   currentTicks = msTicks;	// read current tick counter
   // Now loop until required number of ticks passes.
   while ((msTicks - currentTicks) < delayTicks);
-}
-
-uint32_t get_diff(uint32_t value1, uint32_t value2) {
-	if (value1 == value2) {
-		return 0;
-	}
-	if (value1 > value2) {
-		return (value1 - value2);
-	}
-	else {
-		// check for timer overflow
-		return (UINT32_MAX - value2 + value1);
-	}
 }
 
 
